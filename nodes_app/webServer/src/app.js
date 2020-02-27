@@ -1,14 +1,24 @@
 const path = require('path')
 const express = require('express')
+const hbs = require('hbs')
 
-console.log(__dirname)
-console.log(path.join(__dirname, '../public'))
+// console.log(__dirname)
+// console.log(path.join(__dirname, '../public'))
 
 const app = express()
 
-app.use(express.static(path.join(__dirname, '../public')))
+const publicDirectoryPath = path.join(__dirname, '../public')
+const viewsPath = path.join(__dirname, '../templates/views')
+//app.use(express.static(path.join(__dirname, '../public'))) short cut if public with views instead of templates
+const partialPath = path.join(__dirname, '../templates/partials')
+hbs.registerPartials(partialPath)
 
+//Setup handlebars engine and views location
 app.set('view engine', 'hbs')
+app.set('views', viewsPath)
+
+//Setup static directory to serve
+app.use(express.static(publicDirectoryPath))
 
 app.get('', (req, res) => {
     res.render('index', {
@@ -53,6 +63,21 @@ app.get('/weather', (req, res) => {
     })
 })
 
+app.get('/help/*', (req, res) => {
+    res.render('404page', {
+        title: '404 page',
+        name: 'Jade',
+        errorMessage: 'help article not found'
+    })
+})
+
+app.get('*', (req, res) => {
+    res.render('404page', {
+        title: '404 page',
+        name: 'Jade',
+        errorMessage: 'page not found'
+    })
+})
 app.listen(3000, () => {
     console.log('server up on port 3000')
 })
